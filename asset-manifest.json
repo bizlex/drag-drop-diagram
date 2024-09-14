@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/drag-drop-diagram/static/css/main.5ecd60fb.chunk.css",
+    "main.js": "/drag-drop-diagram/static/js/main.07234f4a.chunk.js",
+    "main.js.map": "/drag-drop-diagram/static/js/main.07234f4a.chunk.js.map",
+    "runtime~main.js": "/drag-drop-diagram/static/js/runtime~main.8f466f60.js",
+    "runtime~main.js.map": "/drag-drop-diagram/static/js/runtime~main.8f466f60.js.map",
+    "static/js/2.33a115b8.chunk.js": "/drag-drop-diagram/static/js/2.33a115b8.chunk.js",
+    "static/js/2.33a115b8.chunk.js.map": "/drag-drop-diagram/static/js/2.33a115b8.chunk.js.map",
+    "index.html": "/drag-drop-diagram/index.html",
+    "precache-manifest.f8d3800a23e35a0c48f47224bbc70192.js": "/drag-drop-diagram/precache-manifest.f8d3800a23e35a0c48f47224bbc70192.js",
+    "service-worker.js": "/drag-drop-diagram/service-worker.js",
+    "static/css/main.5ecd60fb.chunk.css.map": "/drag-drop-diagram/static/css/main.5ecd60fb.chunk.css.map"
+  }
+}
