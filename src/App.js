@@ -1,24 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import TextField from './components/TextField';
+import DiagramField from './components/DiagramField';
+import Toolbox from './components/Toolbox';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <DndProvider backend={HTML5Backend}>
+      <div style={{ display: 'flex', height: '100vh' }}>
+        <div style={{ flex: 1, padding: '10px' }}>
+          <h2>Text Field</h2>
+          <TextField />
+        </div>
+        <div style={{ flex: 2, padding: '10px' }}>
+          <h2>Diagram Field</h2>
+          <DiagramField />
+        </div>
+        <div style={{ flex: 1, padding: '10px' }}>
+          <h2>Toolbox</h2>
+          <Toolbox />
+        </div>
+      </div>
+    </DndProvider>
   );
 }
 
