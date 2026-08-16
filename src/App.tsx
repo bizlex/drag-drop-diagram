@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { createDocumentFromText, defaultDomainDependencies, resetDocumentFromText } from './domain/diagram/operations';
 import type { DiagramDocument } from './domain/diagram/types';
+import { DiagramCanvas } from './features/canvas/DiagramCanvas';
 import { SourceTextPanel } from './features/source-text/SourceTextPanel';
 import styles from './App.module.css';
 
@@ -33,7 +34,7 @@ function App() {
         <SourceTextPanel document={document} draftSourceText={draftSourceText} onDraftChange={setDraftSourceText} onCreate={create} onReset={reset} />
         <section className={styles.workspace} aria-labelledby="workspace-title">
           <h2 id="workspace-title">Diagram workspace</h2>
-          <p>Workspace placeholder — token placement and SVG editing will be added in a later package.</p>
+          <DiagramCanvas document={document} />
           {error && <p role="alert">{error}</p>}
         </section>
       </div>

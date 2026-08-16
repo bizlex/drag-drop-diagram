@@ -1,0 +1,38 @@
+.scrollArea {
+  min-width: 0;
+  overflow: auto;
+  border: 1px solid #94a3b8;
+  background: #cbd5e1;
+}
+
+.canvas {
+  display: block;
+  min-width: max-content;
+  font-family: inherit;
+  font-size: 20px;
+  fill: #0f172a;
+}
+
+.selectionOutline {
+  fill: none;
+  stroke: #1d4ed8;
+  stroke-dasharray: 4 3;
+  stroke-width: 2;
+}
+
+.selectionHandle {
+  fill: #ffffff;
+  stroke: #1d4ed8;
+  stroke-width: 1.5;
+}
+
+.emptyState {
+  display: grid;
+  min-height: 16rem;
+  place-items: center;
+  padding: 1.5rem;
+  border: 1px dashed #94a3b8;
+  background: #ffffff;
+  color: #475569;
+  text-align: center;
+}
