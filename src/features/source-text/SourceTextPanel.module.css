@@ -1,0 +1,18 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: #ffffff;
+  border-right: 1px solid #cbd5e1;
+}
+
+.panel h2, .panel h3 { margin: 0; }
+.panel textarea { width: 100%; box-sizing: border-box; font: inherit; padding: 0.75rem; }
+.panel button { align-self: flex-start; padding: 0.55rem 0.8rem; font: inherit; cursor: pointer; }
+.actions { display: flex; gap: 0.5rem; }
+.error { color: #9f1239; margin: 0; }
+.confirmation { padding: 0.75rem; border: 1px solid #f59e0b; background: #fffbeb; }
+.confirmation p { margin-top: 0; }
+.tokens { margin: 0; padding-left: 1.5rem; line-height: 1.8; }
+.tokenSummary { color: #475569; font-size: 0.9rem; margin: 0; }

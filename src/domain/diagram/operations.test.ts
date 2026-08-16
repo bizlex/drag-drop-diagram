@@ -4,11 +4,13 @@ import {
   addConnector,
   addJunction,
   createDiagramDocument,
+  createDocumentFromText,
   deleteElement,
   moveConnectorEndpoint,
   moveElement,
   placeToken,
   replaceDocumentFromImport,
+  resetDocumentFromText,
   type DomainDependencies,
   type DomainResult,
 } from './operations';
@@ -36,6 +38,46 @@ function unwrap<T>(result: DomainResult<T>): T {
 }
 
 describe('diagram operations', () => {
+  it('creates a document from exact source text and tokenizes it', () => {
+    const result = createDocumentFromText(
+      { title: 'Text', sourceText: '  same\t same  ', canvas: { width: 1, height: 2, background: 'white' } },
+      dependencies('document-1', 'token-1', 'token-2'),
+    );
+    const document = unwrap(result);
+    expect(document.sourceText).toBe('  same\t same  ');
+    expect(document.tokens).toEqual([
+      { id: 'token-1', index: 0, text: 'same' },
+      { id: 'token-2', index: 1, text: 'same' },
+    ]);
+  });
+
+  it('rejects empty source text atomically', () => {
+    const result = createDocumentFromText(
+      { title: 'Text', sourceText: ' \t\n', canvas: { width: 1, height: 2, background: 'white' } },
+      dependencies('unused'),
+    );
+    expect(result).toMatchObject({ ok: false, error: { code: 'EMPTY_SOURCE_TEXT' } });
+  });
+
+  it('resets source text while preserving identity and settings and clearing elements', () => {
+    const original = {
+      ...makeDocument(),
+      elements: [{ id: 'word-1', type: 'word' as const, tokenId: 'token-1', x: 1, y: 2 }],
+    };
+    const result = resetDocumentFromText(original, { sourceText: 'new text' }, dependencies('new-1', 'new-2'));
+    const document = unwrap(result);
+    expect(document).toMatchObject({ id: original.id, title: original.title, createdAt: original.createdAt, sourceText: 'new text', elements: [] });
+    expect(document.canvas).toEqual(original.canvas);
+    expect(document.updatedAt).toBe(MUTATION_TIME);
+    expect(original.elements).toHaveLength(1);
+  });
+
+  it('rejects an invalid reset without mutating the original', () => {
+    const original = makeDocument();
+    const snapshot = structuredClone(original);
+    expect(resetDocumentFromText(original, { sourceText: '   ' }, dependencies('unused'))).toMatchObject({ ok: false, error: { code: 'EMPTY_SOURCE_TEXT' } });
+    expect(original).toEqual(snapshot);
+  });
   it('creates a validated base document from prepared tokens with deterministic ID and time', () => {
     const tokens = [
       { id: 'token-a', index: 0, text: 'word' },

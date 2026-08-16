@@ -1,6 +1,7 @@
 import { generateEntityId, type IdGenerator } from '../../shared/ids';
 import { currentIsoTimestamp, type Clock } from '../../shared/time';
 import { validateDiagramDocument } from './schema';
+import { tokenizeSourceText } from './tokenizer';
 import type {
   CanvasSettings,
   ConnectorElement,
@@ -16,7 +17,8 @@ export type DomainErrorCode =
   | 'TOKEN_ALREADY_PLACED'
   | 'ELEMENT_NOT_FOUND'
   | 'ELEMENT_NOT_MOVABLE'
-  | 'ENDPOINT_NOT_FREE';
+  | 'ENDPOINT_NOT_FREE'
+  | 'EMPTY_SOURCE_TEXT';
 
 export interface DomainError {
   code: DomainErrorCode;
@@ -45,6 +47,16 @@ export interface CreateDocumentInput {
   canvas: CanvasSettings;
 }
 
+export interface CreateDocumentFromTextInput {
+  title: string;
+  sourceText: string;
+  canvas: CanvasSettings;
+}
+
+export interface ResetDocumentFromTextInput {
+  sourceText: string;
+}
+
 export interface Position {
   x: number;
   y: number;
@@ -71,6 +83,14 @@ export interface MoveConnectorEndpointInput extends Position {
 
 function failure(code: DomainErrorCode, message: string): DomainResult<never> {
   return { ok: false, error: { code, message } };
+}
+
+function sourceTextIsEmpty(sourceText: string) {
+  return !/\S/u.test(sourceText);
+}
+
+function invalidSourceText(): DomainResult<never> {
+  return failure('EMPTY_SOURCE_TEXT', 'Source text must contain at least one non-whitespace character');
 }
 
 function validateCandidate(candidate: unknown): DomainResult<DiagramDocument> {
@@ -116,6 +136,42 @@ export function createDiagramDocument(
     canvas: { ...input.canvas },
     createdAt: timestamp,
     updatedAt: timestamp,
+  });
+}
+
+export function createDocumentFromText(
+  input: CreateDocumentFromTextInput,
+  dependencies: DomainDependencies = defaultDomainDependencies,
+): DomainResult<DiagramDocument> {
+  if (sourceTextIsEmpty(input.sourceText)) return invalidSourceText();
+  const timestamp = dependencies.now();
+  const documentId = dependencies.generateId();
+  return validateCandidate({
+    schemaVersion: 1,
+    id: documentId,
+    title: input.title,
+    sourceText: input.sourceText,
+    tokens: tokenizeSourceText(input.sourceText, dependencies.generateId),
+    elements: [],
+    canvas: { ...input.canvas },
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  });
+}
+
+export function resetDocumentFromText(
+  document: DiagramDocument,
+  input: ResetDocumentFromTextInput,
+  dependencies: DomainDependencies = defaultDomainDependencies,
+): DomainResult<DiagramDocument> {
+  if (sourceTextIsEmpty(input.sourceText)) return invalidSourceText();
+
+  return validateCandidate({
+    ...document,
+    sourceText: input.sourceText,
+    tokens: tokenizeSourceText(input.sourceText, dependencies.generateId),
+    elements: [],
+    updatedAt: dependencies.now(),
   });
 }
 

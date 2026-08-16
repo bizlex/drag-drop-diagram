@@ -1,23 +1,29 @@
 import {
   addConnector,
   addJunction,
+  createDocumentFromText,
   defaultDomainDependencies,
   deleteElement,
   moveConnectorEndpoint,
   moveElement,
   placeToken,
   replaceDocumentFromImport,
+  resetDocumentFromText,
   type AddConnectorInput,
+  type CreateDocumentFromTextInput,
   type DomainDependencies,
   type DomainResult,
   type MoveConnectorEndpointInput,
   type MoveElementInput,
   type PlaceTokenInput,
   type Position,
+  type ResetDocumentFromTextInput,
 } from './operations';
 import type { DiagramDocument, EntityId } from './types';
 
 export type DiagramAction =
+  | { type: 'CREATE_DOCUMENT_FROM_TEXT'; payload: CreateDocumentFromTextInput }
+  | { type: 'RESET_DOCUMENT_FROM_TEXT'; payload: ResetDocumentFromTextInput }
   | { type: 'PLACE_TOKEN'; payload: PlaceTokenInput }
   | { type: 'MOVE_ELEMENT'; payload: MoveElementInput }
   | { type: 'ADD_JUNCTION'; payload: Position }
@@ -39,6 +45,10 @@ export function createDiagramReducer(
 ): DiagramReducer {
   return (document, action) => {
     switch (action.type) {
+      case 'CREATE_DOCUMENT_FROM_TEXT':
+        return createDocumentFromText(action.payload, dependencies);
+      case 'RESET_DOCUMENT_FROM_TEXT':
+        return resetDocumentFromText(document, action.payload, dependencies);
       case 'PLACE_TOKEN':
         return placeToken(document, action.payload, dependencies);
       case 'MOVE_ELEMENT':
