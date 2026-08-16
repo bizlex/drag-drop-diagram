@@ -64,6 +64,23 @@ describe('DiagramCanvas', () => {
     ]);
     expect(screen.getByTestId('selection-overlay-word-1')).toBeInTheDocument();
     expect(screen.queryByTestId('selection-overlay-word-2')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Move word 1: same' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Move word 2: same' })).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByTestId('selection-overlay-word-1').querySelector('rect')).toHaveAttribute('width', '70');
+  });
+
+  it('omits a word with a missing token reference without crashing', () => {
+    const invalidDocument: DiagramDocument = {
+      ...makeDocument(),
+      elements: [
+        { id: 'orphan-word', type: 'word', tokenId: 'missing-token', x: 10, y: 20 },
+      ],
+    };
+
+    render(<DiagramCanvas document={invalidDocument} selectedElementId="orphan-word" />);
+
+    expect(screen.getByRole('group', { name: 'Diagram SVG workspace' })).toBeInTheDocument();
+    expect(screen.queryByTestId('word-element-orphan-word')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('selection-overlay-orphan-word')).not.toBeInTheDocument();
   });
 });

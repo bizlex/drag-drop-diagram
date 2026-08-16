@@ -13,6 +13,29 @@
   fill: #0f172a;
 }
 
+.word {
+  cursor: grab;
+  touch-action: none;
+}
+
+.word:active {
+  cursor: grabbing;
+}
+
+.word:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+
+.interactionPreview {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.selectionLayer {
+  pointer-events: none;
+}
+
 .selectionOutline {
   fill: none;
   stroke: #1d4ed8;

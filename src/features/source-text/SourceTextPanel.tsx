@@ -93,7 +93,18 @@ export function SourceTextPanel({
           <h3 id="tokens-title">Available tokens</h3>
           {availableTokens.length > 0 ? (
             <ol className={styles.tokens}>
-              {availableTokens.map((token) => <li key={token.id} data-token-id={token.id}>{token.text}</li>)}
+              {availableTokens.map((token) => (
+                <li key={token.id}>
+                  <button
+                    aria-label={`Place token ${token.index + 1}: ${token.text}`}
+                    className={styles.token}
+                    data-source-token-id={token.id}
+                    type="button"
+                  >
+                    {token.text}
+                  </button>
+                </li>
+              ))}
             </ol>
           ) : <p>No unplaced tokens.</p>}
           <p className={styles.tokenSummary}>

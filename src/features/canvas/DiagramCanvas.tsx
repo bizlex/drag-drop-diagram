@@ -2,10 +2,13 @@ import { useCallback, useLayoutEffect, useState } from 'react';
 
 import type { DiagramDocument, EntityId, WordElement as WordElementModel } from '../../domain/diagram/types';
 import { WordElement } from './WordElement';
+import type { CanvasInteractionPreview } from './useCanvasInteraction';
 import styles from './DiagramCanvas.module.css';
 
 interface DiagramCanvasProps {
   document: DiagramDocument | null;
+  interactionPreview?: CanvasInteractionPreview | null;
+  onSvgChange?: (svg: SVGSVGElement | null) => void;
   selectedElementId?: EntityId | null;
 }
 
@@ -84,11 +87,17 @@ function SelectionOverlay({
   );
 }
 
-export function DiagramCanvas({ document, selectedElementId = null }: DiagramCanvasProps) {
+export function DiagramCanvas({
+  document,
+  interactionPreview = null,
+  onSvgChange,
+  selectedElementId = null,
+}: DiagramCanvasProps) {
   const [svg, setSvg] = useState<SVGSVGElement | null>(null);
   const setSvgRef = useCallback((node: SVGSVGElement | null) => {
     setSvg(node);
-  }, []);
+    onSvgChange?.(node);
+  }, [onSvgChange]);
 
   if (!document) {
     return (
@@ -98,24 +107,37 @@ export function DiagramCanvas({ document, selectedElementId = null }: DiagramCan
     );
   }
 
-  const selectedWord = document.elements.find(
+  const renderedWords = document.elements.flatMap((element) => {
+    if (element.type !== 'word') return [];
+    if (interactionPreview?.kind === 'move' && interactionPreview.elementId === element.id) {
+      return [{ ...element, ...interactionPreview.position }];
+    }
+    return [element];
+  });
+  const selectedWord = renderedWords.find(
     (element): element is WordElementModel =>
-      element.id === selectedElementId && element.type === 'word',
+      element.id === selectedElementId,
   );
+  const placementToken =
+    interactionPreview?.kind === 'placement'
+      ? document.tokens.find((token) => token.id === interactionPreview.tokenId)
+      : null;
 
   return (
     <div className={styles.scrollArea}>
       <svg
         aria-label="Diagram SVG workspace"
         className={styles.canvas}
+        data-canvas-interaction-surface="canvas"
         height={document.canvas.height}
-        role="img"
+        role="group"
         ref={setSvgRef}
         viewBox={`0 0 ${document.canvas.width} ${document.canvas.height}`}
         width={document.canvas.width}
       >
         <g data-diagram-layer="background">
           <rect
+            data-canvas-interaction-surface="canvas"
             data-testid="canvas-background"
             fill={document.canvas.background}
             height={document.canvas.height}
@@ -127,14 +149,31 @@ export function DiagramCanvas({ document, selectedElementId = null }: DiagramCan
         <g data-diagram-layer="connectors" />
         <g data-diagram-layer="junctions" />
         <g data-diagram-layer="words">
-          {document.elements.map((element) =>
-            element.type === 'word' ? (
-              <WordElement document={document} element={element} key={element.id} />
-            ) : null,
-          )}
+          {renderedWords.map((element) => (
+            <WordElement
+              document={document}
+              element={element}
+              key={element.id}
+              selected={element.id === selectedElementId}
+            />
+          ))}
         </g>
-        <g data-diagram-layer="selection-and-previews">
+        <g
+          className={styles.selectionLayer}
+          data-diagram-layer="selection-and-previews"
+        >
           {selectedWord && <SelectionOverlay document={document} svg={svg} word={selectedWord} />}
+          {placementToken && interactionPreview?.kind === 'placement' && (
+            <text
+              aria-hidden="true"
+              className={styles.interactionPreview}
+              data-testid={`placement-preview-${placementToken.id}`}
+              x={interactionPreview.position.x}
+              y={interactionPreview.position.y}
+            >
+              {placementToken.text}
+            </text>
+          )}
         </g>
       </svg>
     </div>

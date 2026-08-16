@@ -17,7 +17,7 @@ describe('App', () => {
     await user.type(screen.getByLabelText('Source text input'), 'слово Ἐν בְּרֵאשִׁית');
     await user.click(screen.getByRole('button', { name: 'Create diagram' }));
 
-    expect(screen.getByRole('img', { name: 'Diagram SVG workspace' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Diagram SVG workspace' })).toBeInTheDocument();
     expect(screen.getByText(/3 total/)).toBeInTheDocument();
   });
 });
